@@ -9,7 +9,7 @@
 </head>
 
 <body>
-
+    @include('navbar')
     <h1>Νέος Λογαριασμός 📝</h1>
     <p><a href="/bills">← Πίσω στη Λίστα</a></p>
 

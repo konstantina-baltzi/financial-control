@@ -12,6 +12,7 @@ class Bill extends Model
     // Ορίζουμε ποια πεδία μπορούν να συμπληρωθούν μαζικά
     protected $fillable = [
         'user_id',
+        'category_id',
         'title',
         'amount',
         'paid_at',
@@ -24,4 +25,9 @@ class Bill extends Model
         'paid_at' => 'date',
         'expires_at' => 'date',
     ];
+
+    public function bills()
+    {
+        return $this->hasMany(Bill::class);
+    }
 }

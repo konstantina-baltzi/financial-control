@@ -9,7 +9,7 @@
 </head>
 
 <body>
-
+    @include('navbar')
     <h1>Επεξεργασία: {{ $bill->title }} ✏️</h1>
     <p><a href="/bills">← Πίσω στη Λίστα</a></p>
 

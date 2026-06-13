@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body>
 
+<body>
+    @include('navbar')
     <h1>Financial Control 📊</h1>
     <h2>Οι Λογαριασμοί μου</h2>
     <div style="display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap;">
