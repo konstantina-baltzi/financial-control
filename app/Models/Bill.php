@@ -11,6 +11,7 @@ class Bill extends Model
 
     // Ορίζουμε ποια πεδία μπορούν να συμπληρωθούν μαζικά
     protected $fillable = [
+        'user_id',
         'title',
         'amount',
         'paid_at',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use App\Models\Bill;
 use Illuminate\Http\Request;
 
@@ -10,20 +11,14 @@ class BillController extends Controller
     // Η συνάρτηση που θα δείχνει τη λίστα με τους λογαριασμούς
     public function index()
     {
-        // 1. Παίρνουμε όλους τους λογαριασμούς (όπως πριν)
-        $bills = Bill::all();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
-        // 2. Υπολογίζουμε το σύνολο των ΠΛΗΡΩΜΕΝΩΝ λογαριασμών
-        $totalPaid = Bill::whereNotNull('paid_at')->sum('amount');
-
-        // 3. Υπολογίζουμε το σύνολο των ΑΠΛΗΡΩΤΩΝ λογαριασμών
-        $totalUnpaid = Bill::whereNull('paid_at')->sum('amount');
-
-        // 4. Μετράμε πόσοι είναι οι ΛΗΓΜΕΝΟΙ (εκπρόθεσμοι) λογαριασμοί
-        $expiredCount = Bill::whereNull('paid_at')
-            ->whereNotNull('expires_at')
-            ->where('expires_at', '<', now()->startOfDay())
-            ->count();
+        // Τώρα τραβάμε τα δεδομένα χωρίς κανένα σφάλμα
+        $bills = $user->bills;
+        $totalPaid = $user->bills()->whereNotNull('paid_at')->sum('amount');
+        $totalUnpaid = $user->bills()->whereNull('paid_at')->sum('amount');
+        $expiredCount = $user->bills()->whereNull('paid_at')->whereNotNull('expires_at')->where('expires_at', '<', now()->startOfDay())->count();
 
         // Στέλνουμε όλα τα δεδομένα στο view
         return view('bills.index', compact('bills', 'totalPaid', 'totalUnpaid', 'expiredCount'));
@@ -47,7 +42,10 @@ class BillController extends Controller
         ]);
 
         // Αποθήκευση στη βάση δεδομένων με βάση το $fillable που ορίσαμε στο Model
-        Bill::create($request->all());
+        $data = $request->all();
+        $data['user_id'] = Auth::id();
+
+        Bill::create($data);
 
         // Μόλις αποθηκευτεί, ανακατευθύνουμε τον χρήστη πίσω στη λίστα με ένα μήνυμα επιτυχίας
         return redirect('/bills')->with('success', 'Ο λογαριασμός προστέθηκε επιτυχώς!');
