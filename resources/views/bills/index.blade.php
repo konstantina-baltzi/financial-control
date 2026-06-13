@@ -12,7 +12,14 @@
 
     <h1>Financial Control 📊</h1>
     <h2>Οι Λογαριασμοί μου</h2>
+    <p><a href="/bills/create" style="background-color: #0076d6; color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px;">+ Προσθήκη Νέου Λογαριασμού</a></p>
 
+    {{-- Εμφάνιση μηνύματος επιτυχίας αν υπάρχει --}}
+    @if(session('success'))
+    <div style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+        {{ session('success') }}
+    </div>
+    @endif
     <table>
         <thead>
             <tr>
