@@ -17,4 +17,9 @@ class Bill extends Model
         'expires_at',
         'notes',
     ];
+
+    protected $casts = [
+        'paid_at' => 'date',
+        'expires_at' => 'date',
+    ];
 }

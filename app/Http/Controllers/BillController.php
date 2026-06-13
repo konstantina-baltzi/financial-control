@@ -10,11 +10,23 @@ class BillController extends Controller
     // Η συνάρτηση που θα δείχνει τη λίστα με τους λογαριασμούς
     public function index()
     {
-        // Παίρνουμε όλους τους λογαριασμούς από τη βάση δεδομένων
+        // 1. Παίρνουμε όλους τους λογαριασμούς (όπως πριν)
         $bills = Bill::all();
 
-        // Στέλνουμε τους λογαριασμούς στο view που λέγεται "bills.index"
-        return view('bills.index', compact('bills'));
+        // 2. Υπολογίζουμε το σύνολο των ΠΛΗΡΩΜΕΝΩΝ λογαριασμών
+        $totalPaid = Bill::whereNotNull('paid_at')->sum('amount');
+
+        // 3. Υπολογίζουμε το σύνολο των ΑΠΛΗΡΩΤΩΝ λογαριασμών
+        $totalUnpaid = Bill::whereNull('paid_at')->sum('amount');
+
+        // 4. Μετράμε πόσοι είναι οι ΛΗΓΜΕΝΟΙ (εκπρόθεσμοι) λογαριασμοί
+        $expiredCount = Bill::whereNull('paid_at')
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<', now()->startOfDay())
+            ->count();
+
+        // Στέλνουμε όλα τα δεδομένα στο view
+        return view('bills.index', compact('bills', 'totalPaid', 'totalUnpaid', 'expiredCount'));
     }
     // 1. Δείχνει τη σελίδα με τη φόρμα
     public function create()
@@ -52,5 +64,32 @@ class BillController extends Controller
 
         // Γυρνάμε πίσω με μήνυμα επιτυχίας
         return redirect('/bills')->with('success', 'Ο λογαριασμός διαγράφηκε επιτυχώς!');
+    }
+
+    // 1. Εμφάνιση της φόρμας επεξεργασίας για έναν συγκεκριμένο λογαριασμό
+    public function edit($id)
+    {
+        $bill = Bill::findOrFail($id); // Βρίσκουμε τον λογαριασμό ή πετάει 404 αν δεν υπάρχει
+        return view('bills.edit', compact('bill'));
+    }
+
+    // 2. Αποθήκευση των αλλαγών (Update)
+    public function update(Request $request, $id)
+    {
+        // Έλεγχος εγκυρότητας
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'amount' => 'nullable|numeric',
+            'paid_at' => 'nullable|date',
+            'expires_at' => 'nullable|date',
+            'notes' => 'nullable|string',
+        ]);
+
+        $bill = Bill::findOrFail($id);
+
+        // Ενημέρωση των στοιχείων στη βάση
+        $bill->update($request->all());
+
+        return redirect('/bills')->with('success', 'Ο λογαριασμός ανανεώθηκε επιτυχώς!');
     }
 }
