@@ -74,20 +74,49 @@ class BillController extends Controller
     // 2. Αποθήκευση των αλλαγών (Update)
     public function update(Request $request, $id)
     {
-        // Έλεγχος εγκυρότητας
         $request->validate([
             'title' => 'required|string|max:255',
             'amount' => 'nullable|numeric',
             'paid_at' => 'nullable|date',
             'expires_at' => 'nullable|date',
             'notes' => 'nullable|string',
+            'frequency' => 'required|string',
         ]);
 
         $bill = Bill::findOrFail($id);
 
-        // Ενημέρωση των στοιχείων στη βάση
+        // Κρατάμε την παλιά κατάσταση πληρωμής για να δούμε αν άλλαξε ΤΩΡΑ σε πληρωμένο
+        $wasPaid = !is_null($bill->paid_at);
+        $isPaidNow = !is_null($request->paid_at);
+
+        // Ενημερώνουμε τον τρέχοντα λογαριασμό
         $bill->update($request->all());
 
-        return redirect('/bills')->with('success', 'Ο λογαριασμός ανανεώθηκε επιτυχώς!');
+        // ΑΝ ο λογαριασμός δεν ήταν πληρωμένος, αλλά πληρώθηκε ΤΩΡΑ, και είναι επαναλαμβανόμενος:
+        if (!$wasPaid && $isPaidNow && $bill->frequency !== 'none') {
+
+            // Υπολογίζουμε τη νέα ημερομηνία λήξης για τον επόμενο λογαριασμό
+            $newExpiresAt = $bill->expires_at;
+            if ($newExpiresAt) {
+                if ($bill->frequency === 'monthly') {
+                    $newExpiresAt = $bill->expires_at->addMonth();
+                } elseif ($bill->frequency === 'yearly') {
+                    $newExpiresAt = $bill->expires_at->addYear();
+                }
+            }
+
+            // Δημιουργούμε τον επόμενο λογαριασμό (αντίγραφο) στη βάση, αλλά ΑΠΛΗΡΩΤΟ
+            Bill::create([
+                'user_id' => $bill->user_id,
+                'title' => $bill->title,
+                'amount' => $bill->amount,
+                'paid_at' => null, // Ο νέος είναι απλήρωτος
+                'expires_at' => $newExpiresAt,
+                'frequency' => $bill->frequency,
+                'notes' => $bill->notes,
+            ]);
+        }
+
+        return redirect('/bills')->with('success', 'Ο λογαριασμός ενημερώθηκε επιτυχώς!');
     }
 }

@@ -17,6 +17,7 @@ class Bill extends Model
         'paid_at',
         'expires_at',
         'notes',
+        'frequency',
     ];
 
     protected $casts = [

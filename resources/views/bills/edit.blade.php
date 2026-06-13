@@ -35,6 +35,13 @@
         <label for="notes">Σημειώσεις:</label>
         <textarea id="notes" name="notes" rows="4">{{ $bill->notes }}</textarea>
 
+        <label for="frequency">Επανάληψη Λογαριασμού:</label>
+        <select id="frequency" name="frequency">
+            <option value="none" {{ $bill->frequency == 'none' ? 'selected' : '' }}>Όχι, είναι εφάπαξ</option>
+            <option value="monthly" {{ $bill->frequency == 'monthly' ? 'selected' : '' }}>Κάθε Μήνα</option>
+            <option value="yearly" {{ $bill->frequency == 'yearly' ? 'selected' : '' }}>Κάθε Χρόνο</option>
+        </select>
+
         <button type="submit">Αποθήκευση Αλλαγών</button>
     </form>
 

@@ -33,6 +33,13 @@
         <label for="notes">Σημειώσεις:</label>
         <textarea id="notes" name="notes" rows="4"></textarea>
 
+        <label for="frequency">Επανάληψη Λογαριασμού:</label>
+        <select id="frequency" name="frequency">
+            <option value="none">Όχι, είναι εφάπαξ</option>
+            <option value="monthly">Κάθε Μήνα</option>
+            <option value="yearly">Κάθε Χρόνο</option>
+        </select>
+
         <button type="submit">Αποθήκευση Λογαριασμού</button>
     </form>
 
