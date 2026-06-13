@@ -40,4 +40,17 @@ class BillController extends Controller
         // Μόλις αποθηκευτεί, ανακατευθύνουμε τον χρήστη πίσω στη λίστα με ένα μήνυμα επιτυχίας
         return redirect('/bills')->with('success', 'Ο λογαριασμός προστέθηκε επιτυχώς!');
     }
+
+    // Διαγραφή λογαριασμού
+    public function destroy($id)
+    {
+        // Βρίσκουμε τον λογαριασμό με βάση το ID του
+        $bill = Bill::findOrFail($id);
+
+        // Τον διαγράφουμε από τη βάση
+        $bill->delete();
+
+        // Γυρνάμε πίσω με μήνυμα επιτυχίας
+        return redirect('/bills')->with('success', 'Ο λογαριασμός διαγράφηκε επιτυχώς!');
+    }
 }

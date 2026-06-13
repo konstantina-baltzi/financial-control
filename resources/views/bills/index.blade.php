@@ -28,10 +28,10 @@
                 <th>Ημερ. Πληρωμής</th>
                 <th>Ημερ. Λήξης</th>
                 <th>Σημειώσεις</th>
+                <th>Ενέργειες</th>
             </tr>
         </thead>
         <tbody>
-            {{-- Εδώ η Laravel κάνει λούπα (foreach) όλους τους λογαριασμούς --}}
             @forelse($bills as $bill)
             <tr>
                 <td><strong>{{ $bill->title }}</strong></td>
@@ -39,10 +39,17 @@
                 <td>{{ $bill->paid_at ?? 'Δεν πληρώθηκε' }}</td>
                 <td>{{ $bill->expires_at ?? '-' }}</td>
                 <td>{{ $bill->notes ?? '-' }}</td>
+                <td>
+                    <form action="/bills/{{ $bill->id }}" method="POST" style="display:inline;" onsubmit="return confirm('Είσαι σίγουρη ότι θέλεις να διαγράψεις αυτόν τον λογαριασμό;');">
+                        @csrf
+                        @method('DELETE') {{-- Λέμε στη Laravel ότι αυτή η POST φόρμα είναι στην πραγματικότητα DELETE --}}
+                        <button type="submit" style="background-color: #ff4d4d; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Διαγραφή</button>
+                    </form>
+                </td>
             </tr>
             @empty
             <tr>
-                <td colspan="5" style="text-align: center;">Δεν υπάρχουν καταχωρημένοι λογαριασμοί ακόμα!</td>
+                <td colspan="6" style="text-align: center;">Δεν υπάρχουν καταχωρημένοι λογαριασμοί ακόμα!</td>
             </tr>
             @endforelse
         </tbody>
