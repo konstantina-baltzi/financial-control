@@ -7,6 +7,23 @@
     <title>Διαχείριση Κατηγοριών</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            max-width: 1200px !important;
+            width: 95%;
+            margin: 20px auto;
+        }
+
+        table {
+            width: 100% !important;
+        }
+
+        th,
+        td {
+            padding: 12px !important;
+            vertical-align: middle;
+        }
+    </style>
 </head>
 
 <body>

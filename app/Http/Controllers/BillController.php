@@ -5,28 +5,72 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Bill;
 use Illuminate\Http\Request;
+use App\Models\Category;
 
 class BillController extends Controller
 {
     // Η συνάρτηση που θα δείχνει τη λίστα με τους λογαριασμούς
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Τώρα τραβάμε τα δεδομένα χωρίς κανένα σφάλμα
-        $bills = $user->bills;
-        $totalPaid = $user->bills()->whereNotNull('paid_at')->sum('amount');
-        $totalUnpaid = $user->bills()->whereNull('paid_at')->sum('amount');
-        $expiredCount = $user->bills()->whereNull('paid_at')->whereNotNull('expires_at')->where('expires_at', '<', now()->startOfDay())->count();
+        // 1. Καθορισμός Μήνα και Έτους (Default: Ο τρέχων μήνας και έτος)
+        $selectedMonth = $request->input('month', date('m'));
+        $selectedYear = $request->input('year', date('Y'));
 
-        // Στέλνουμε όλα τα δεδομένα στο view
-        return view('bills.index', compact('bills', 'totalPaid', 'totalUnpaid', 'expiredCount'));
+        // 2. Δημιουργία του βασικού Query για τον συγκεκριμένο Μήνα και Έτος
+        // Φιλτράρουμε με βάση την ημερομηνία λήξης (expires_at)
+        $baseQuery = $user->bills()
+            ->whereYear('expires_at', $selectedYear)
+            ->whereMonth('expires_at', $selectedMonth);
+
+        // 3. Υπολογισμός Στατιστικών ΜΟΝΟ για τον επιλεγμένο μήνα/έτος
+        $totalPaid = (clone $baseQuery)->whereNotNull('paid_at')->sum('amount');
+        $totalUnpaid = (clone $baseQuery)->whereNull('paid_at')->sum('amount');
+        $expiredCount = (clone $baseQuery)->whereNull('paid_at')->where('expires_at', '<', now()->startOfDay())->count();
+
+        // 4. Εφαρμογή των έξτρα φίλτρων στον πίνακα (Κατηγορία & Κατάσταση)
+        $tableQuery = clone $baseQuery;
+
+        if ($request->has('category_id') && $request->category_id != '') {
+            $tableQuery->where('category_id', $request->category_id);
+        }
+
+        if ($request->has('status') && $request->status != '') {
+            if ($request->status == 'paid') {
+                $tableQuery->whereNotNull('paid_at');
+            } elseif ($request->status == 'unpaid') {
+                $tableQuery->whereNull('paid_at');
+            }
+        }
+
+        // Παίρνουμε τους τελικούς λογαριασμούς για τον πίνακα
+        $bills = $tableQuery->orderBy('expires_at', 'asc')->get();
+
+        // Παίρνουμε τις κατηγορίες του χρήστη για το dropdown
+        $categories = $user->categories;
+
+        // Φτιάχνουμε μια λίστα με τα τελευταία 5 χρόνια για το φίλτρο του έτους
+        $years = range(date('Y'), date('Y') - 4);
+
+        // Στέλνουμε όλα τα δεδομένα στο view, μαζί με τις επιλογές του χρήστη
+        return view('bills.index', compact(
+            'bills',
+            'totalPaid',
+            'totalUnpaid',
+            'expiredCount',
+            'categories',
+            'selectedMonth',
+            'selectedYear',
+            'years'
+        ));
     }
     // 1. Δείχνει τη σελίδα με τη φόρμα
     public function create()
     {
-        return view('bills.create');
+        $categories = auth()->user()->categories; // Παίρνουμε τις κατηγορίες του χρήστη
+        return view('bills.create', compact('categories'));
     }
 
     // 2. Παίρνει τα δεδομένα της φόρμας και τα αποθηκεύει στη βάση
@@ -36,9 +80,10 @@ class BillController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'amount' => 'nullable|numeric',
-            'paid_at' => 'nullable|date',
             'expires_at' => 'nullable|date',
+            'category_id' => 'nullable|exists:categories,id', // Έλεγχος αν η κατηγορία υπάρχει στη βάση
             'notes' => 'nullable|string',
+            'frequency' => 'required|string',
         ]);
 
         // Αποθήκευση στη βάση δεδομένων με βάση το $fillable που ορίσαμε στο Model
@@ -67,10 +112,10 @@ class BillController extends Controller
     // 1. Εμφάνιση της φόρμας επεξεργασίας για έναν συγκεκριμένο λογαριασμό
     public function edit($id)
     {
-        $bill = Bill::findOrFail($id); // Βρίσκουμε τον λογαριασμό ή πετάει 404 αν δεν υπάρχει
-        return view('bills.edit', compact('bill'));
+        $bill = Bill::findOrFail($id);
+        $categories = auth()->user()->categories; // Παίρνουμε τις κατηγορίες
+        return view('bills.edit', compact('bill', 'categories'));
     }
-
     // 2. Αποθήκευση των αλλαγών (Update)
     public function update(Request $request, $id)
     {
@@ -81,6 +126,7 @@ class BillController extends Controller
             'expires_at' => 'nullable|date',
             'notes' => 'nullable|string',
             'frequency' => 'required|string',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $bill = Bill::findOrFail($id);

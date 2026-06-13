@@ -10,7 +10,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect('/bills');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -22,7 +22,7 @@ Route::middleware('auth')->group(function () {
 require __DIR__ . '/auth.php';
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/bills', [BillController::class, 'index']);
+    Route::get('/bills', [BillController::class, 'index'])->middleware('auth')->name('bills.index');
     Route::get('/bills/create', [BillController::class, 'create']);
     Route::post('/bills', [BillController::class, 'store']);
     Route::get('/bills/{id}/edit', [BillController::class, 'edit']);

@@ -30,4 +30,9 @@ class Bill extends Model
     {
         return $this->hasMany(Bill::class);
     }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

@@ -7,6 +7,29 @@
     <title>Financial Control - Λογαριασμοί</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Σπάμε το στενό όριο του water.css για να απλωθεί η εφαρμογή */
+        body {
+            max-width: 1200px !important;
+            /* Ή 95% αν το θες σχεδόν full screen */
+            width: 95%;
+            margin: 20px auto;
+        }
+
+        /* Διορθώνουμε τον πίνακα να μην στριμώχνεται */
+        table {
+            width: 100% !important;
+            table-layout: auto;
+        }
+
+        /* Δίνουμε λίγο αέρα στις στήλες για να μην καβαλάνε η μία την άλλη */
+        th,
+        td {
+            padding: 12px 8px !important;
+            text-align: left;
+            vertical-align: middle;
+        }
+    </style>
 </head>
 
 
@@ -40,10 +63,66 @@
         {{ session('success') }}
     </div>
     @endif
+
+    <form action="/bills" method="GET" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+
+        <div>
+            <label for="filter_month" style="font-size: 14px; font-weight: bold; margin-right: 5px;">Μήνας:</label>
+            <select name="month" id="filter_month" onchange="this.form.submit()" style="padding: 8px 12px; border-radius: 4px; min-width: 160px; font-size: 14px; font-weight: 500;">
+                @foreach([
+                '01' => 'Ιανουάριος', '02' => 'Φεβρουάριος', '03' => 'Μάρτιος', '04' => 'Απρίλιος',
+                '05' => 'Μάιος', '06' => 'Ιούνιος', '07' => 'Ιούλιος', '08' => 'Αύγουστος',
+                '09' => 'Σεπτέμβριος', '10' => 'Οκτώβριος', '11' => 'Νοέμβριος', '12' => 'Δεκέμβριος'
+                ] as $num => $name)
+                <option value="{{ $num }}" {{ $selectedMonth == $num ? 'selected' : '' }}>{{ $name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label for="filter_year" style="font-size: 14px; font-weight: bold; margin-right: 5px;">Έτος:</label>
+            <select name="year" id="filter_year" onchange="this.form.submit()" style="padding: 8px 12px; border-radius: 4px; min-width: 100px; font-size: 14px; font-weight: 500;">
+                @foreach($years as $year)
+                <option value="{{ $year }}" {{ $selectedYear == $year ? 'selected' : '' }}>{{ $year }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <span style="color: #ccc; margin: 0 5px;">|</span>
+
+        <div>
+            <label for="filter_category" style="font-size: 14px; font-weight: bold; margin-right: 5px;">Κατηγορία:</label>
+            <select name="category_id" id="filter_category" onchange="this.form.submit()" style="padding: 6px; border-radius: 4px;">
+                <option value="">Όλες</option>
+                @foreach($categories as $category)
+                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                    {{ $category->name }}
+                </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label for="filter_status" style="font-size: 14px; font-weight: bold; margin-right: 5px;">Κατάσταση:</label>
+            <select name="status" id="filter_status" onchange="this.form.submit()" style="padding: 6px; border-radius: 4px;">
+                <option value="">Όλοι</option>
+                <option value="unpaid" {{ request('status') == 'unpaid' ? 'selected' : '' }}>❌ Απλήρωτοι</option>
+                <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>✅ Πληρωμένοι</option>
+            </select>
+        </div>
+
+        @if($selectedMonth != date('m') || $selectedYear != date('Y') || request('category_id') || request('status'))
+        <div>
+            <a href="/bills" style="font-size: 13px; color: #ff5252; text-decoration: none; font-weight: bold;">🔄 Τρέχων Μήνας</a>
+        </div>
+        @endif
+
+    </form>
     <table>
         <thead>
             <tr>
                 <th>Όνομα Υποχρέωσης</th>
+                <th>Κατηγορία</th>
                 <th>Ποσό (€)</th>
                 <th>Ημερ. Πληρωμής</th>
                 <th>Ημερ. Λήξης</th>
@@ -87,6 +166,15 @@
                             <strong>{{ $bill->title }}</strong>
                             @if($statusText)
                             <br><small style="font-style: italic; color: #555;">{{ $statusText }}</small>
+                            @endif
+                        </td>
+                        <td>
+                            @if($bill->category)
+                            <span style="background-color: {{ $bill->category->color }}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; white-space: nowrap;">
+                                {{ $bill->category->name }}
+                            </span>
+                            @else
+                            <span style="color: #999; font-style: italic; font-size: 13px;">Χωρίς κατηγορία</span>
                             @endif
                         </td>
                         <td>{{ $bill->amount ? $bill->amount . ' €' : '-' }}</td>

@@ -42,6 +42,16 @@
             <option value="yearly" {{ $bill->frequency == 'yearly' ? 'selected' : '' }}>Κάθε Χρόνο</option>
         </select>
 
+        <label for="category_id">Κατηγορία:</label>
+        <select id="category_id" name="category_id">
+            <option value="">-- Χωρίς Κατηγορία --</option>
+            @foreach($categories as $category)
+            <option value="{{ $category->id }}" {{ $bill->category_id == $category->id ? 'selected' : '' }}>
+                {{ $category->name }}
+            </option>
+            @endforeach
+        </select>
+
         <button type="submit">Αποθήκευση Αλλαγών</button>
     </form>
 
