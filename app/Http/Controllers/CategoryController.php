@@ -25,7 +25,7 @@ class CategoryController extends Controller
 
         Auth::user()->categories()->create($request->all());
 
-        return redirect('/categories')->with('success', 'Η κατηγορία προστέθηκε!');
+        return redirect('/categories')->with('success', 'Category added successfully!');
     }
 
     // 3. EDIT: Εμφάνιση φόρμας επεξεργασίας
@@ -46,7 +46,7 @@ class CategoryController extends Controller
         $category = Auth::user()->categories()->findOrFail($id);
         $category->update($request->all());
 
-        return redirect('/categories')->with('success', 'Η κατηγορία ενημερώθηκε!');
+        return redirect('/categories')->with('success', 'Category updated successfully!');
     }
 
     // 5. DELETE: Διαγραφή κατηγορίας
@@ -55,6 +55,6 @@ class CategoryController extends Controller
         $category = Auth::user()->categories()->findOrFail($id);
         $category->delete();
 
-        return redirect('/categories')->with('success', 'Η κατηγορία διαγράφηκε!');
+        return redirect('/categories')->with('success', 'Category deleted successfully!');
     }
 }

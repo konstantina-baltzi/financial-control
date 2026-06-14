@@ -9,6 +9,15 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+Route::middleware(['web'])->group(function () {
+    Route::get('/lang/{locale}', function ($locale) {
+        if (in_array($locale, ['en', 'el'])) {
+            session()->put('locale', $locale);
+        }
+        return redirect()->back();
+    })->name('lang.switch');
+});
+
 Route::get('/dashboard', function () {
     return redirect('/bills');
 })->middleware(['auth', 'verified'])->name('dashboard');
