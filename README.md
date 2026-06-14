@@ -1,59 +1,96 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📊 Financial Control Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A modern, lightweight web application for tracking and managing monthly/yearly financial obligations and bills, built with **Laravel 11**. This app helps users monitor their expenses, keep track of pending, paid, or overdue bills, and fully supports **dual-language switching (English & Greek)**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## ✨ Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* **Bills Management (Full CRUD):** Create, read, update, and delete financial obligations with fields for title, amount, payment date, due date, and custom notes.
+* **Smart Color-Coded Styling:**
+    * 🟩 **Green:** Fully paid bills.
+    * 🟥 **Red:** Overdue bills (🚨 *OVERDUE!* badge).
+    * 🟨 **Yellow:** Upcoming bills expiring soon (within 5 days).
+    * 🟦 **Soft Blue:** Pending bills with plenty of time left.
+* **Category Management:** Create custom categories with a built-in Color Picker for seamless visual grouping (e.g., House, Car, Subscriptions).
+* **Advanced Filtering & Search:** Filter your bills instantly by Month, Year, Category, and Status (Paid/Unpaid).
+* **Multi-language Support:** Complete integration for Greek (`el`) and English (`en`) using a custom localization Middleware that persists choices across sessions, complete with a clean text-based toggle (EN/EL) using Font Awesome icons in the Navbar.
+* **Dynamic Dashboard Statistics:** Overview cards calculating Total Paid Amounts, Total Pending Amounts, and the exact count of Overdue Bills at the top of your page.
+* **Water.css Integration:** A clean, responsive, and lightweight drop-in UI that automatically adapts to Dark/Light mode depending on the user's system preferences.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 📸 Screenshots
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Main Dashboard (Bills Overview)
+![Dashboard Screenshot](https://raw.githubusercontent.com/konstantina-baltzi/financial-control/main/public/screenshots/dashboard.png)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Category Management & Language Toggle
+![Categories & Lang Screenshot](https://raw.githubusercontent.com/konstantina-baltzi/financial-control/main/public/screenshots/categories.png)
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🛠️ Tech Stack
 
-### Premium Partners
+* **Backend Framework:** Laravel 11 (PHP 8.2+)
+* **Frontend Templating:** Blade Template Engine
+* **Database:** MySQL / MariaDB
+* **CSS Framework:** Water.css (Lightweight Drop-in Stylesheet)
+* **Icons:** Font Awesome 6.4.0
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 🚀 Installation Guide
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Follow these steps to set up and run the application locally:
 
-## Code of Conduct
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/konstantina-baltzi/financial-control.git](https://github.com/konstantina-baltzi/financial-control.git)
+cd financial-control
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. Install Dependencies
+Bash
+composer install
+3. Environment Configuration (.env)
+Copy the .env.example file to create your own configuration:
 
-## Security Vulnerabilities
+Bash
+cp .env.example .env
+Open the .env file and configure your local database settings:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Απόσπασμα κώδικα
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=financial_control
+DB_USERNAME=root
+DB_PASSWORD=
+4. Generate Application Key
+Bash
+php artisan key:generate
+5. Run Database Migrations
+Create all necessary tables (users, bills, categories) inside your database:
 
-## License
+Bash
+php artisan migrate
+6. Start the Local Server
+Bash
+php artisan serve
+Your application will be live and accessible at: http://127.0.0.1:8000
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+📂 Localization Structure
+The multi-language system relies on JSON key-value translation files. If you want to modify text strings, you can find them here:
+
+Plaintext
+lang/
+├── el.json  <-- Greek translation dictionary
+└── en.json  <-- English translation dictionary
+🔒 Security & Middlewares
+The application ensures secure user isolation and persistence through:
+
+Auth Middleware: Restricts access, ensuring views are only accessible to logged-in users.
+
+SetLocaleMiddleware: Inspects the session on every incoming request and triggers app()->setLocale(), providing a seamless bilingual experience.
+
+@csrf Protection: Mandatory Cross-Site Request Forgery tokens integrated across all operational forms (POST, PUT, DELETE).
